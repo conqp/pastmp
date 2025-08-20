@@ -13,11 +13,14 @@ pub struct Records {
 
 impl Records {
     /// Insert a new record.
-    pub fn insert(&self, bytes: Box<[u8]>) {
+    #[must_use]
+    pub fn insert(&self, bytes: Box<[u8]>) -> usize {
+        let id = self.next_id();
         self.records
             .write()
             .unwrap_or_else(PoisonError::into_inner)
-            .insert(self.next_id(), Record::new(bytes));
+            .insert(id, Record::new(bytes));
+        id
     }
 
     /// Get the respective record.

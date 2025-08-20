@@ -1,7 +1,7 @@
-use record::Record;
-use rocket::{State, delete, get, launch, post, routes};
-
 use crate::account::{Account, AuthenticationError};
+use record::Record;
+use rocket::serde::json::Json;
+use rocket::{State, delete, get, launch, post, routes};
 use settings::Settings;
 
 mod account;
@@ -17,10 +17,10 @@ fn upload(
     state: &State<Settings>,
     account: Account,
     data: Vec<u8>,
-) -> Result<(), AuthenticationError> {
+) -> Result<Json<usize>, AuthenticationError> {
     account.validate(&state.accounts, &state.hasher)?;
-    state.records.insert(data.into_boxed_slice());
-    Ok(())
+    let id = state.records.insert(data.into_boxed_slice());
+    Ok(id.into())
 }
 
 #[get("/<id>")]
