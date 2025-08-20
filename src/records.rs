@@ -29,20 +29,20 @@ impl Records {
 
     /// Get the respective record.
     #[must_use]
-    pub fn get<'a>(&'a self, id: &'a usize) -> Option<Record> {
+    pub fn get(&self, id: usize) -> Option<Record> {
         self.records
             .read()
             .unwrap_or_else(PoisonError::into_inner)
-            .get(id)
+            .get(&id)
             .cloned()
     }
 
     /// Remove the respective record.
-    pub fn remove(&self, id: &usize) -> Option<Record> {
+    pub fn remove(&self, id: usize) -> Option<Record> {
         self.records
             .write()
             .unwrap_or_else(PoisonError::into_inner)
-            .remove(id)
+            .remove(&id)
     }
 
     /// Remove old entries.

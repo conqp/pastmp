@@ -32,7 +32,7 @@ fn download(
 ) -> Result<Option<Box<[u8]>>, AuthenticationError> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
 
-    let Some(record) = state.records.get(&id) else {
+    let Some(record) = state.records.get(id) else {
         return Ok(None);
     };
 
@@ -46,7 +46,7 @@ fn remove(
     id: usize,
 ) -> Result<(), AuthenticationError> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
-    state.records.remove(&id);
+    state.records.remove(id);
     Ok(())
 }
 
