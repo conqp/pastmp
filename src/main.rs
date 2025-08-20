@@ -1,11 +1,11 @@
-use crate::account::{Account, AuthenticationError};
+use basic_authorization::{AuthenticationError, BasicAuthorization};
 use record::Record;
 use rocket::serde::json::Json;
 use rocket::{State, delete, get, launch, post, routes};
 use settings::Settings;
 
-mod account;
 mod accounts;
+mod basic_authorization;
 mod record;
 mod records;
 mod settings;
@@ -15,10 +15,10 @@ const SETTINGS: &str = "/etc/pastmp.json";
 #[post("/", data = "<data>")]
 fn upload(
     state: &State<Settings>,
-    account: Account,
+    basic_auth: BasicAuthorization,
     data: Vec<u8>,
 ) -> Result<Json<usize>, AuthenticationError> {
-    account.validate(&state.accounts, &state.hasher)?;
+    basic_auth.validate(&state.accounts, &state.hasher)?;
     let id = state.records.insert(data.into_boxed_slice());
     Ok(id.into())
 }
@@ -26,10 +26,10 @@ fn upload(
 #[get("/<id>")]
 fn download(
     state: &State<Settings>,
-    account: Account,
+    basic_auth: BasicAuthorization,
     id: usize,
 ) -> Result<Option<Box<[u8]>>, AuthenticationError> {
-    account.validate(&state.accounts, &state.hasher)?;
+    basic_auth.validate(&state.accounts, &state.hasher)?;
 
     let Some(record) = state.records.get(&id) else {
         return Ok(None);
@@ -39,8 +39,12 @@ fn download(
 }
 
 #[delete("/<id>")]
-fn remove(state: &State<Settings>, account: Account, id: usize) -> Result<(), AuthenticationError> {
-    account.validate(&state.accounts, &state.hasher)?;
+fn remove(
+    state: &State<Settings>,
+    basic_auth: BasicAuthorization,
+    id: usize,
+) -> Result<(), AuthenticationError> {
+    basic_auth.validate(&state.accounts, &state.hasher)?;
     state.records.remove(&id);
     Ok(())
 }

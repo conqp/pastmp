@@ -9,12 +9,12 @@ use rocket::{Request, Response, response};
 
 /// A user account.
 #[derive(Clone, Debug)]
-pub struct Account {
+pub struct BasicAuthorization {
     user_name: String,
     password: String,
 }
 
-impl Account {
+impl BasicAuthorization {
     /// Validate the password.
     pub fn validate(
         &self,
@@ -45,7 +45,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for AuthenticationError {
 }
 
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for Account {
+impl<'r> FromRequest<'r> for BasicAuthorization {
     type Error = FromRequestError;
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
