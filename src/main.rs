@@ -19,6 +19,7 @@ fn upload(
     data: Vec<u8>,
 ) -> Result<Json<usize>, AuthenticationError> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
+    state.records.remove_old_entries();
     let id = state.records.insert(data.into_boxed_slice());
     Ok(id.into())
 }
