@@ -1,9 +1,11 @@
-use crate::accounts::Accounts;
-use crate::records::Records;
-use argon2::Argon2;
 use std::collections::BTreeMap;
 use std::fs::OpenOptions;
 use std::path::Path;
+
+use argon2::Argon2;
+
+use crate::accounts::Accounts;
+use crate::records::Records;
 
 #[derive(Debug)]
 pub struct Settings {

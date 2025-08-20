@@ -1,4 +1,3 @@
-use crate::accounts::Accounts;
 use argon2::{PasswordVerifier, password_hash};
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
@@ -6,6 +5,8 @@ use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::response::Responder;
 use rocket::{Request, Response, response};
+
+use crate::accounts::Accounts;
 
 /// A user account.
 #[derive(Clone, Debug)]

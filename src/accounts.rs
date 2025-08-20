@@ -1,6 +1,7 @@
+use std::collections::BTreeMap;
+
 use argon2::password_hash;
 use argon2::password_hash::PasswordHashString;
-use std::collections::BTreeMap;
 
 #[derive(Clone, Debug)]
 pub struct Accounts(BTreeMap<String, PasswordHashString>);

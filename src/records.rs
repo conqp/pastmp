@@ -1,8 +1,9 @@
-use crate::Record;
 use std::collections::BTreeMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::SeqCst;
 use std::sync::{PoisonError, RwLock};
+
+use crate::Record;
 
 /// A collection of records.
 #[derive(Debug, Default)]
