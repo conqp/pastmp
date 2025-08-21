@@ -1,4 +1,3 @@
-use std::collections::BTreeMap;
 use std::fs::OpenOptions;
 use std::path::Path;
 
@@ -16,10 +15,8 @@ pub struct Settings {
 
 impl Settings {
     pub fn load(file: impl AsRef<Path>) -> anyhow::Result<Self> {
-        let file = OpenOptions::new().read(true).open(file)?;
-        let accounts: BTreeMap<String, String> = serde_json::from_reader(file)?;
         Ok(Self {
-            accounts: Accounts::try_from(accounts)?,
+            accounts: serde_json::from_reader(OpenOptions::new().read(true).open(file)?)?,
             records: Records::default(),
             hasher: Argon2::default(),
         })

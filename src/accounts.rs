@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 
 use argon2::password_hash;
 use argon2::password_hash::PasswordHashString;
+use rocket::serde::de::Error;
+use rocket::serde::{Deserialize, Deserializer};
 
 #[derive(Clone, Debug)]
 pub struct Accounts(BTreeMap<String, PasswordHashString>);
@@ -24,5 +26,15 @@ impl TryFrom<BTreeMap<String, String>> for Accounts {
         }
 
         Ok(Self(inner))
+    }
+}
+
+impl<'de> Deserialize<'de> for Accounts {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Accounts::try_from(BTreeMap::<String, String>::deserialize(deserializer)?)
+            .map_err(D::Error::custom)
     }
 }
