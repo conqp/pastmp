@@ -1,7 +1,8 @@
+use std::ops::Deref;
 use std::time::Instant;
 
 /// A pastebin data record.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Record {
     created: Instant,
     content: Box<[u8]>,
@@ -20,9 +21,12 @@ impl Record {
     pub fn created(&self) -> Instant {
         self.created
     }
+}
 
-    /// Return the content.
-    pub fn into_content(self) -> Box<[u8]> {
-        self.content
+impl Deref for Record {
+    type Target = [u8];
+
+    fn deref(&self) -> &Self::Target {
+        &self.content
     }
 }

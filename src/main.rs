@@ -1,6 +1,7 @@
 use basic_authorization::BasicAuthorization;
 use error::Error;
 use record::Record;
+use rocket::log::private::info;
 use rocket::serde::json::Json;
 use rocket::{State, delete, get, launch, post, routes};
 use settings::Settings;
@@ -21,8 +22,18 @@ fn upload(
     data: Vec<u8>,
 ) -> Result<Json<usize>, Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
+    info!("Adding record of size {} bytes.", data.len());
+    info!(
+        "Total memory used before cleanup: {} bytes",
+        state.records.size()
+    );
     state.records.remove_old_entries();
+    info!(
+        "Total memory used after cleanup: {} bytes",
+        state.records.size()
+    );
     let id = state.records.insert(data.into_boxed_slice());
+    info!("Total memory used: {} bytes", state.records.size());
     Ok(id.into())
 }
 
@@ -34,21 +45,29 @@ fn download(
 ) -> Result<Box<[u8]>, Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
 
-    let Some(record) = state.records.get(id) else {
+    let Some(content) = state.records.get(id) else {
         return Err(Error::NotFound);
     };
 
-    Ok(record.into_content())
+    Ok(content)
 }
 
 #[delete("/<id>")]
 fn remove(state: &State<Settings>, basic_auth: BasicAuthorization, id: usize) -> Result<(), Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
+    info!(
+        "Total memory used before removal: {} bytes",
+        state.records.size()
+    );
 
     if state.records.remove(id).is_none() {
         return Err(Error::NotFound);
     }
 
+    info!(
+        "Total memory used after removal: {} bytes",
+        state.records.size()
+    );
     Ok(())
 }
 

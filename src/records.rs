@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::ops::Deref;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::SeqCst;
 use std::sync::{PoisonError, RwLock};
@@ -29,12 +30,12 @@ impl Records {
 
     /// Get the respective record.
     #[must_use]
-    pub fn get(&self, id: usize) -> Option<Record> {
+    pub fn get(&self, id: usize) -> Option<Box<[u8]>> {
         self.records
             .read()
             .unwrap_or_else(PoisonError::into_inner)
             .get(&id)
-            .cloned()
+            .map(|record| record.deref().into())
     }
 
     /// Remove the respective record.
@@ -51,6 +52,16 @@ impl Records {
             .write()
             .unwrap_or_else(PoisonError::into_inner)
             .retain(|_, record| record.created().elapsed() < MAX_RETENTION_TIME);
+    }
+
+    /// Return the accumulated size of all records.
+    pub fn size(&self) -> usize {
+        self.records
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .values()
+            .map(|record| record.len())
+            .sum()
     }
 
     /// Return the next ID to assign and increase the ID.
