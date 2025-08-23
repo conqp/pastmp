@@ -1,4 +1,5 @@
-use basic_authorization::{AuthenticationError, BasicAuthorization};
+use basic_authorization::BasicAuthorization;
+use error::Error;
 use record::Record;
 use rocket::serde::json::Json;
 use rocket::{State, delete, get, launch, post, routes};
@@ -6,6 +7,7 @@ use settings::Settings;
 
 mod accounts;
 mod basic_authorization;
+mod error;
 mod record;
 mod records;
 mod settings;
@@ -17,7 +19,7 @@ fn upload(
     state: &State<Settings>,
     basic_auth: BasicAuthorization,
     data: Vec<u8>,
-) -> Result<Json<usize>, AuthenticationError> {
+) -> Result<Json<usize>, Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
     state.records.remove_old_entries();
     let id = state.records.insert(data.into_boxed_slice());
@@ -29,24 +31,24 @@ fn download(
     state: &State<Settings>,
     basic_auth: BasicAuthorization,
     id: usize,
-) -> Result<Option<Box<[u8]>>, AuthenticationError> {
+) -> Result<Box<[u8]>, Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
 
     let Some(record) = state.records.get(id) else {
-        return Ok(None);
+        return Err(Error::NotFound);
     };
 
-    Ok(Some(record.into_content()))
+    Ok(record.into_content())
 }
 
 #[delete("/<id>")]
-fn remove(
-    state: &State<Settings>,
-    basic_auth: BasicAuthorization,
-    id: usize,
-) -> Result<(), AuthenticationError> {
+fn remove(state: &State<Settings>, basic_auth: BasicAuthorization, id: usize) -> Result<(), Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
-    state.records.remove(id);
+
+    if state.records.remove(id).is_none() {
+        return Err(Error::NotFound);
+    }
+
     Ok(())
 }
 
