@@ -1,17 +1,21 @@
 use std::collections::BTreeMap;
+use std::ops::Deref;
 
 use argon2::password_hash;
 use argon2::password_hash::PasswordHashString;
 use rocket::serde::de::Error;
 use rocket::serde::{Deserialize, Deserializer};
 
-#[derive(Clone, Debug)]
-pub struct Accounts(BTreeMap<String, PasswordHashString>);
+type Inner = BTreeMap<String, PasswordHashString>;
 
-impl Accounts {
-    /// Return the respective account's password hash.
-    pub fn get(&self, name: &str) -> Option<&PasswordHashString> {
-        self.0.get(name)
+#[derive(Clone, Debug)]
+pub struct Accounts(Inner);
+
+impl Deref for Accounts {
+    type Target = Inner;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
@@ -19,7 +23,7 @@ impl TryFrom<BTreeMap<String, String>> for Accounts {
     type Error = password_hash::Error;
 
     fn try_from(map: BTreeMap<String, String>) -> Result<Self, Self::Error> {
-        let mut inner = BTreeMap::new();
+        let mut inner = Inner::new();
 
         for (key, value) in map {
             inner.insert(key, PasswordHashString::new(&value)?);
