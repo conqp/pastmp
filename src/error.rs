@@ -4,9 +4,12 @@ use rocket::{Request, Response, response};
 
 use crate::basic_authorization::AuthenticationError;
 
+/// Potential errors of the API.
 #[derive(Debug)]
 pub enum Error {
+    /// The request was unauthorized.
     NotAuthorized(AuthenticationError),
+    /// The requested resource was not found.
     NotFound,
 }
 
