@@ -1,7 +1,19 @@
 [package]
 name = "pastmp"
+authors = ["Richard Neumann <mail@richard-neumann.de>"]
+description = "In-memory storage pastebin service with basic HTTP authentication"
+license = "MIT"
+homepage = "https://github.com/conqp/pastmp/"
+repository = "https://github.com/conqp/pastmp/"
+readme = "README.md"
+documentation = "https://docs.rs/pastmp"
+keywords = ["pastebin", "service"]
+categories = ["web-programming::http-server"]
 version = "0.1.0"
 edition = "2024"
+exclude = [
+    ".gitignore",
+]
 
 [dependencies]
 anyhow = "1.0.99"
