@@ -1,3 +1,5 @@
+//! Pastebin service with basic HTTP authentication, that stores data in RAM.
+
 use basic_authorization::BasicAuthorization;
 use error::Error;
 use record::Record;
