@@ -38,7 +38,7 @@ impl<'de> Deserialize<'de> for Accounts {
     where
         D: Deserializer<'de>,
     {
-        Accounts::try_from(BTreeMap::<String, String>::deserialize(deserializer)?)
+        Self::try_from(BTreeMap::<String, String>::deserialize(deserializer)?)
             .map_err(D::Error::custom)
     }
 }

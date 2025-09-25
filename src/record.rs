@@ -18,7 +18,7 @@ impl Record {
     }
 
     /// Return the instant when the record was crated.
-    pub fn created(&self) -> Instant {
+    pub const fn created(&self) -> Instant {
         self.created
     }
 }

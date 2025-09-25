@@ -17,6 +17,7 @@ mod settings;
 
 const SETTINGS: &str = "/etc/pastmp.json";
 
+#[allow(clippy::needless_pass_by_value)]
 #[post("/", data = "<data>")]
 fn upload(
     state: &State<Settings>,
@@ -39,6 +40,7 @@ fn upload(
     Ok(id.into())
 }
 
+#[allow(clippy::needless_pass_by_value)]
 #[get("/<id>")]
 fn download(
     state: &State<Settings>,
@@ -54,6 +56,7 @@ fn download(
     Ok(content)
 }
 
+#[allow(clippy::needless_pass_by_value)]
 #[delete("/<id>")]
 fn remove(state: &State<Settings>, basic_auth: BasicAuthorization, id: usize) -> Result<(), Error> {
     basic_auth.validate(&state.accounts, &state.hasher)?;
@@ -75,6 +78,7 @@ fn remove(state: &State<Settings>, basic_auth: BasicAuthorization, id: usize) ->
 
 #[launch]
 fn rocket() -> _ {
+    #[allow(clippy::redundant_type_annotations)]
     rocket::build()
         .manage(Settings::load(SETTINGS).expect("Failed to load settings."))
         .mount("/", routes![upload, download, remove])
